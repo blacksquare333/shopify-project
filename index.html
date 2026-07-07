@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Product Price Monitor</title>
+  <style>
+    body { font-family: sans-serif; padding: 40px; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+    th { background: #f4f4f4; }
+    .cheaper { color: green; }
+    .pricier { color: red; }
+  </style>
+</head>
+<body>
+  <h1>Product Price Monitor</h1>
+  <table>
+    <thead>
+    <tr><th>Product</th><th>My Price</th><th>Competitor</th><th>Status</th><th>Description</th></tr>    </thead>
+    <tbody id="rows"></tbody>
+  </table>
+
+  <script>
+    fetch("/products")
+      .then(r => r.json())
+      .then(data => {
+        const rows = document.getElementById("rows");
+        data.forEach(p => {
+          const mine = parseFloat(p.price) || 0;
+          const comp = parseFloat((p.competitor_price || "").replace(/[^0-9.]/g, "")) || 0;
+          const cheaper = mine < comp;
+          rows.innerHTML += `
+            <tr>
+              <td>${p.title}</td>
+              <td>${p.price}</td>
+              <td>${p.competitor_price || "N/A"}</td>
+              <td>${p.description || ""}</td>
+              <td class="${cheaper ? 'cheaper' : 'pricier'}">
+                ${cheaper ? "cheaper" : "pricier"}
+              </td>
+            </tr>`;
+        });
+      });
+  </script>
+</body>
+</html>
