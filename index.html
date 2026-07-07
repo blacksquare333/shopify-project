@@ -20,24 +20,27 @@
     <tbody id="rows"></tbody>
   </table>
 
-  <script>
+  <<script>
+    const THB_PER_USD = 32.5;  
+
     fetch("/products")
       .then(r => r.json())
       .then(data => {
         const rows = document.getElementById("rows");
         data.forEach(p => {
           const mine = parseFloat(p.price) || 0;
-          const comp = parseFloat((p.competitor_price || "").replace(/[^0-9.]/g, "")) || 0;
-          const cheaper = mine < comp;
+          const compThb = parseFloat((p.competitor_price || "").replace(/[^0-9.]/g, "")) || 0;
+          const compUsd = compThb / THB_PER_USD;        
+          const cheaper = mine < compUsd;
           rows.innerHTML += `
             <tr>
               <td>${p.title}</td>
-              <td>${p.price}</td>
-              <td>${p.competitor_price || "N/A"}</td>
-              <td>${p.description || ""}</td>
+              <td>$${mine.toFixed(2)}</td>
+              <td>${p.competitor_price || "N/A"} (≈$${compUsd.toFixed(2)})</td>
               <td class="${cheaper ? 'cheaper' : 'pricier'}">
                 ${cheaper ? "cheaper" : "pricier"}
               </td>
+              <td>${p.description || ""}</td>
             </tr>`;
         });
       });
